@@ -39,15 +39,15 @@
 #        └─ 02.dstone-batch-server-docker-reg.sh   #   Docker Hub 등록 Shell
 #     └─ /workshop/dstone-boot-docker-compose.yml  # dstone-boot Docker Compose 빌드파일
 #     └─ /workshop/dstone-batch-docker-compose.yml # dstone-batch Docker Compose 빌드파일
-#     └─ /workshop/dstone-compose.yml              # 전체 Docker Compose 빌드파일
+#     └─ /workshop/dstone-docker-compose.yml       # 전체 Docker Compose 빌드파일
 # 
 # <작업명령>
 # 1. Docker Compose 실행
-#   - docker-compose -p dstone -f /workshop/dstone-compose.yml up -d
+#   - docker-compose -p dstone -f /workshop/dstone-docker-compose.yml up -d
 # 2. 로그 확인
-#   - docker-compose -p dstone -f /workshop/dstone-compose.yml logs -f
+#   - docker-compose -p dstone -f /workshop/dstone-docker-compose.yml logs -f
 # 3. 중지 및 삭제
-#   - docker-compose -p dstone -f /workshop/dstone-compose.yml down -v
+#   - docker-compose -p dstone -f /workshop/dstone-docker-compose.yml down -v
 ########################################################################################
 services:
   
