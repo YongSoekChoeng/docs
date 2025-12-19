@@ -77,14 +77,17 @@ REM 4. Database
 mkdir %TO_ROOT%\dstone-mysql
 mkdir %TO_ROOT%\dstone-mysql\init-db
 xcopy %FROM_ROOT%\dstone-boot\docs\docker\dstone-mysql %TO_ROOT%\dstone-mysql /E
+del %TO_ROOT%\dstone-mysql\*.bat
 
 REM 5. RabbitMQ
 mkdir %TO_ROOT%\dstone-rabbitmq
 mkdir %TO_ROOT%\dstone-rabbitmq\init-data
 xcopy %FROM_ROOT%\dstone-boot\docs\docker\dstone-rabbitmq %TO_ROOT%\dstone-rabbitmq /E
+del %TO_ROOT%\dstone-rabbitmq\*.bat
 
 REM 6. Redis
 mkdir %TO_ROOT%\dstone-redis
 xcopy %FROM_ROOT%\dstone-boot\docs\docker\dstone-redis %TO_ROOT%\dstone-redis /E
+del %TO_ROOT%\dstone-redis\*.bat
 
 endlocal
