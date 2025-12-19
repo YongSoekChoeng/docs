@@ -42,6 +42,9 @@ set TO_ROOT=C:\Temp\workshop
 
 mkdir %TO_ROOT%
 
+REM 0. All
+copy  .\dstone-docker-compose.yml %TO_ROOT%
+
 REM 1. Batch Application
 mkdir %TO_ROOT%\dstone-batch
 mkdir %TO_ROOT%\dstone-batch\conf
