@@ -11,11 +11,6 @@
 # <사전작업>
 # 1. 작업디렉토리 결정 후 템플릿 복사.
 #   /workshop
-#     └─ /dstone-boot                              # <Boot Application>
-#        ├─ conf/                                  #   설정 파일
-#        ├─ target/                                #   실행 파일
-#        ├─ 01.dstone-boot-docker.yml              #   개별 Docker Compose 빌드파일
-#        └─ 02.dstone-boot-docker-reg.sh           #   Docker Hub 등록 Shell
 #     └─ /dstone-mysql                             # <Database (MySQL)>
 #        ├─ init-db/                               #   DB 초기화 스크립트
 #        ├─ 01.dstone-mysql-docker.yml             #   개별 Docker Compose 빌드파일
@@ -27,6 +22,11 @@
 #     └─ /workshop/dstone-redis                    # <Redis>
 #        ├─ 01.dstone-redis-docker.yml             #   개별 Docker Compose 빌드파일
 #        └─ 02.dstone-redis-docker-reg.sh          #   Docker Hub 등록 Shell
+#     └─ /dstone-boot                              # <Boot Application>
+#        ├─ conf/                                  #   설정 파일
+#        ├─ target/                                #   실행 파일
+#        ├─ 01.dstone-boot-docker.yml              #   개별 Docker Compose 빌드파일
+#        └─ 02.dstone-boot-docker-reg.sh           #   Docker Hub 등록 Shell
 #     └─ /dstone-batch                             # <Batch Application>
 #        ├─ conf/                                  #   설정 파일
 #        ├─ target/                                #   실행 파일
