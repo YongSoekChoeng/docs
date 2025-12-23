@@ -19,10 +19,10 @@ services:
   # Jenkins
   dstone-jenkins:  
     # ---------- 최초작업일 때 ---------------------- #
-    image: jenkins/jenkins:lts-jdk21
+    # image: jenkins/jenkins:lts-jdk21
     # --------------------------------------------- #    
     # ---------- Docker Hub 에서 가져올 때 ---------- #
-    # image: jysn007/dstone-jenkins:latest
+    image: jysn007/dstone-jenkins:latest
     # --------------------------------------------- #    
     container_name: dstone-jenkins
     privileged: true
