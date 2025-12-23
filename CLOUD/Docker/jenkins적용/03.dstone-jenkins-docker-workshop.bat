@@ -12,7 +12,7 @@ REM      ├─ jenkins_home/                          #   jenkins home 디렉�
 REM      ├─ 01.dstone-jenkins-docker.yml           #   개별 Docker Compose 빌드파일
 REM      └─ 02.dstone-jenkins-docker-reg.sh        #   Docker Hub 등록 Shell
 
-set FROM_ROOT=D:\AppHome\framework\docs\CLOUD\Docker\03.Jenkins
+set FROM_ROOT=D:\AppHome\framework\docs\CLOUD\Docker\jenkins적용
 set TO_ROOT=C:\Temp\workshop
 
 mkdir %TO_ROOT%
