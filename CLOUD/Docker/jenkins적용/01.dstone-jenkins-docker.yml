@@ -1,0 +1,47 @@
+########################################################################################
+# <사전작업>
+# 1. 작업디렉토리 결정 후 템플릿 복사.
+#   /workshop
+#     └─ /workshop/dstone-jenkins                  # <Jenkins>
+#        ├─ 01.dstone-jenkins-docker.yml           #   개별 Docker Compose 빌드파일
+#        └─ 02.dstone-jenkins-docker-reg.sh        #   Docker Hub 등록 Shell
+# 
+# <작업명령>
+# 1. Docker Compose 실행
+#   - docker-compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml up -d
+# 2. 로그 확인
+#   - docker-compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml logs -f
+# 3. 중지 및 삭제
+#   - docker-compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml down -v
+########################################################################################
+services:
+  
+  # Jenkins
+  dstone-jenkins:  
+    # ---------- 최초작업일 때 ---------------------- #
+    image: jenkins/jenkins:lts-jdk21
+    # --------------------------------------------- #    
+    # ---------- Docker Hub 에서 가져올 때 ---------- #
+    # image: jysn007/dstone-jenkins:latest
+    # --------------------------------------------- #    
+    container_name: dstone-jenkins
+    privileged: true
+    user: root
+    ports:
+      - "5555:8080"
+      - "50000:50000"
+    volumes:
+      - /workshop/dstone-jenkins/jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # docker.sock 공유. Jenkins → docker-compose 실행 가능
+      - /usr/bin/docker:/usr/bin/docker
+      - /workshop:/workshop
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - JENKINS_OPTS=--prefix=/jenkins
+    restart: unless-stopped
+    networks:
+      - dstone-network
+      
+networks:
+  dstone-network:
+    driver: bridge
