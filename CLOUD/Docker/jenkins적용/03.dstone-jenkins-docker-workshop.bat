@@ -1,18 +1,18 @@
 setlocal
 
 REM =========================================================
-REM Docker Build ë¥¼ ìœ„í•œ ê¸°ë³¸ ê³¨ê²©(workshop)ì„ ìƒì„±.
-REM Destination : C:/Temp/workshop ì•„ë˜ì— ìƒì„±.
+REM Docker Build ¸¦ À§ÇÑ ±âº» °ñ°İ(workshop)À» »ı¼º.
+REM Destination : C:/Temp/workshop ¾Æ·¡¿¡ »ı¼º.
 REM =========================================================
 
 
 REM /workshop
-REM   â””â”€ /workshop/dstone-jenkins                  # <Jenkins>
-REM      â”œâ”€ jenkins_home/                          #   jenkins home ë””ë ‰í† ë¦¬
-REM      â”œâ”€ 01.dstone-jenkins-docker.yml           #   ê°œë³„ Docker Compose ë¹Œë“œíŒŒì¼
-REM      â””â”€ 02.dstone-jenkins-docker-reg.sh        #   Docker Hub ë“±ë¡ Shell
+REM   ¦¦¦¡ /workshop/dstone-jenkins                  # <Jenkins>
+REM      ¦§¦¡ jenkins_home/                          #   jenkins home µğ·ºÅä¸®
+REM      ¦§¦¡ 01.dstone-jenkins-docker.yml           #   °³º° Docker Compose ºôµåÆÄÀÏ
+REM      ¦¦¦¡ 02.dstone-jenkins-docker-reg.sh        #   Docker Hub µî·Ï Shell
 
-set FROM_ROOT=D:\AppHome\framework\docs\CLOUD\Docker\jenkinsì ìš©
+set FROM_ROOT=D:\AppHome\framework\docs\CLOUD\Docker\jenkinsÀû¿ë
 set TO_ROOT=C:\Temp\workshop
 
 mkdir %TO_ROOT%
