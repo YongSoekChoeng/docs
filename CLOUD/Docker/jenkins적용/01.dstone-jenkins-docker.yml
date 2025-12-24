@@ -8,11 +8,11 @@
 # 
 # <작업명령>
 # 1. Docker Compose 실행
-#   - docker-compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml up -d
+#   - docker compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml up -d
 # 2. 로그 확인
-#   - docker-compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml logs -f
+#   - docker compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml logs -f
 # 3. 중지 및 삭제
-#   - docker-compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml down -v
+#   - docker compose -p dstone -f /workshop/dstone-jenkins/01.dstone-jenkins-docker.yml down -v
 ########################################################################################
 services:
   
@@ -32,7 +32,7 @@ services:
       - "50000:50000"
     volumes:
       - /workshop/dstone-jenkins/jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock # docker.sock 공유. Jenkins → docker-compose 실행 가능
+      - /var/run/docker.sock:/var/run/docker.sock # docker.sock 공유. Jenkins → docker compose 실행 가능
       - /usr/bin/docker:/usr/bin/docker
       - /workshop:/workshop
     environment:
