@@ -1,0 +1,507 @@
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dstone
+
+---
+# MySQL PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+  namespace: dstone
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+
+---
+# MySQL Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dstone-mysql
+  namespace: dstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dstone-mysql
+  template:
+    metadata:
+      labels:
+        app: dstone-mysql
+    spec:
+      containers:
+      - name: mysql
+        image: jysn007/dstone-mysql:latest
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "db2admin!@"
+        - name: MYSQL_CHARACTER_SET_SERVER
+          value: "utf8mb4"
+        - name: MYSQL_COLLATION_SERVER
+          value: "utf8mb4_0900_ai_ci"
+        args:
+        - --character-set-server=utf8mb4
+        - --collation-server=utf8mb4_0900_ai_ci
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+        - name: init-db
+          mountPath: /docker-entrypoint-initdb.d
+        livenessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          exec:
+            command:
+            - mysqladmin
+            - ping
+            - -h
+            - localhost
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 5
+      volumes:
+      - name: mysql-data
+        persistentVolumeClaim:
+          claimName: mysql-data
+      - name: init-db
+        hostPath:
+          path: /workshop/dstone-mysql/init-db
+          type: Directory
+
+---
+# MySQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: dstone-mysql
+  namespace: dstone
+spec:
+  type: ClusterIP
+  ports:
+  - port: 3306
+    targetPort: 3306
+  selector:
+    app: dstone-mysql
+
+---
+# RabbitMQ PersistentVolumeClaim (data)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-data
+  namespace: dstone
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# RabbitMQ PersistentVolumeClaim (log)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rabbitmq-log
+  namespace: dstone
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+
+---
+# RabbitMQ Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dstone-rabbitmq
+  namespace: dstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dstone-rabbitmq
+  template:
+    metadata:
+      labels:
+        app: dstone-rabbitmq
+    spec:
+      hostname: dstone-rabbitmq
+      containers:
+      - name: rabbitmq
+        image: jysn007/dstone-rabbitmq:latest
+        ports:
+        - containerPort: 5672
+          name: amqp
+        - containerPort: 15672
+          name: management
+        env:
+        - name: RABBITMQ_LOAD_DEFINITIONS
+          value: "/etc/rabbitmq/definitions.json"
+        volumeMounts:
+        - name: rabbitmq-data
+          mountPath: /var/lib/rabbitmq
+        - name: rabbitmq-log
+          mountPath: /var/log/rabbitmq
+        - name: definitions
+          mountPath: /etc/rabbitmq/definitions.json
+          subPath: dstone-rabbitmq_data.json
+          readOnly: true
+        - name: config
+          mountPath: /etc/rabbitmq/rabbitmq.conf
+          subPath: rabbitmq.conf
+          readOnly: true
+        livenessProbe:
+          exec:
+            command:
+            - rabbitmq-diagnostics
+            - -q
+            - ping
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        readinessProbe:
+          exec:
+            command:
+            - rabbitmq-diagnostics
+            - -q
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+      volumes:
+      - name: rabbitmq-data
+        persistentVolumeClaim:
+          claimName: rabbitmq-data
+      - name: rabbitmq-log
+        persistentVolumeClaim:
+          claimName: rabbitmq-log
+      - name: definitions
+        hostPath:
+          path: /workshop/dstone-rabbitmq/init-data
+          type: Directory
+      - name: config
+        hostPath:
+          path: /workshop/dstone-rabbitmq/init-data
+          type: Directory
+
+---
+# RabbitMQ Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: dstone-rabbitmq
+  namespace: dstone
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5672
+    targetPort: 5672
+    name: amqp
+  - port: 15672
+    targetPort: 15672
+    name: management
+  selector:
+    app: dstone-rabbitmq
+
+---
+# Redis PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: dstone
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# Redis Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dstone-redis
+  namespace: dstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dstone-redis
+  template:
+    metadata:
+      labels:
+        app: dstone-redis
+    spec:
+      hostname: dstone-redis
+      containers:
+      - name: redis
+        image: jysn007/dstone-redis:latest
+        ports:
+        - containerPort: 6379
+        command:
+        - redis-server
+        - --protected-mode
+        - "no"
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-data
+
+---
+# Redis Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: dstone-redis
+  namespace: dstone
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: dstone-redis
+
+---
+# dstone-boot Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dstone-boot
+  namespace: dstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dstone-boot
+  template:
+    metadata:
+      labels:
+        app: dstone-boot
+    spec:
+      containers:
+      - name: boot
+        image: jysn007/dstone-boot:latest
+        ports:
+        - containerPort: 7081
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Starting Spring Boot Application..."
+          java -Dspring.profiles.active=dev -jar /workshop/dstone-boot/target/dstone-boot.war net.dstone.DstoneBootApplication
+        volumeMounts:
+        - name: boot-target
+          mountPath: /workshop/dstone-boot/target
+        - name: boot-conf
+          mountPath: /workshop/dstone-boot/conf
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "dev"
+      volumes:
+      - name: boot-target
+        hostPath:
+          path: /workshop/dstone-boot/target
+          type: Directory
+      - name: boot-conf
+        hostPath:
+          path: /workshop/dstone-boot/conf
+          type: Directory
+
+---
+# dstone-boot Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: dstone-boot
+  namespace: dstone
+spec:
+  type: NodePort
+  ports:
+  - port: 7081
+    targetPort: 7081
+    nodePort: 30081
+  selector:
+    app: dstone-boot
+
+---
+# dstone-batch-server ConfigMap (env)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dstone-batch-server-env
+  namespace: dstone
+data:
+  # env-dev.properties 내용을 여기에 추가하세요
+  SPRING_PROFILES_ACTIVE: "dev"
+
+---
+# dstone-batch-server Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dstone-batch-server
+  namespace: dstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dstone-batch-server
+  template:
+    metadata:
+      labels:
+        app: dstone-batch-server
+    spec:
+      containers:
+      - name: batch-server
+        image: jysn007/dstone-batch-server:latest
+        ports:
+        - containerPort: 9393
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Starting Dataflow Server..."
+          java -Dspring.profiles.active=dev -jar /workshop/dstone-batch-server/target/spring-cloud-dataflow-server-2.11.5.jar --spring.config.location=/workshop/dstone-batch-server/conf/dataflow-server.yml
+        volumeMounts:
+        - name: batch-server-target
+          mountPath: /workshop/dstone-batch-server/target
+        - name: batch-server-conf
+          mountPath: /workshop/dstone-batch-server/conf
+        - name: batch-target
+          mountPath: /workshop/dstone-batch/target
+        - name: batch-conf
+          mountPath: /workshop/dstone-batch/conf
+        envFrom:
+        - configMapRef:
+            name: dstone-batch-server-env
+      volumes:
+      - name: batch-server-target
+        hostPath:
+          path: /workshop/dstone-batch-server/target
+          type: Directory
+      - name: batch-server-conf
+        hostPath:
+          path: /workshop/dstone-batch-server/conf
+          type: Directory
+      - name: batch-target
+        hostPath:
+          path: /workshop/dstone-batch/target
+          type: Directory
+      - name: batch-conf
+        hostPath:
+          path: /workshop/dstone-batch/conf
+          type: Directory
+
+---
+# dstone-batch-server Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: dstone-batch-server
+  namespace: dstone
+spec:
+  type: NodePort
+  ports:
+  - port: 9393
+    targetPort: 9393
+    nodePort: 30393
+  selector:
+    app: dstone-batch-server
+
+---
+# dstone-batch Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dstone-batch
+  namespace: dstone
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dstone-batch
+  template:
+    metadata:
+      labels:
+        app: dstone-batch
+    spec:
+      containers:
+      - name: batch
+        image: jysn007/dstone-batch:latest
+        ports:
+        - containerPort: 6081
+        command:
+        - /bin/bash
+        - -c
+        - |
+          echo "Starting Spring Boot Application..."
+          java -Dspring.profiles.active=dev -jar /workshop/dstone-batch/target/dstone-batch-0.0.1-SNAPSHOT.jar net.dstone.batch.common.DstoneBatchApplication
+        volumeMounts:
+        - name: batch-target
+          mountPath: /workshop/dstone-batch/target
+        - name: batch-conf
+          mountPath: /workshop/dstone-batch/conf
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "dev"
+      volumes:
+      - name: batch-target
+        hostPath:
+          path: /workshop/dstone-batch/target
+          type: Directory
+      - name: batch-conf
+        hostPath:
+          path: /workshop/dstone-batch/conf
+          type: Directory
+
+---
+# dstone-batch Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: dstone-batch
+  namespace: dstone
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6081
+    targetPort: 6081
+  selector:
+    app: dstone-batch
